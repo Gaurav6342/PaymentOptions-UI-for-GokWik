@@ -1,0 +1,404 @@
+/* PaymentOptions.css */
+
+.payment-options {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* text-align: center; */
+  overflow-y: auto; /* Enable vertical scrolling when content exceeds height */
+  overflow-x: auto;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid lightgrey;
+}
+
+.back-arrow {
+  width: 20px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.mamaearth-logo {
+  height: 20px; /* Adjusted size */
+  margin-top: 4px; /* Added gap */
+  padding-bottom: 10px; /* Add padding to create space between text and underline */
+}
+
+.amount-to-pay {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.rupee-symbol {
+  width: 1em; /* Same as text size */
+  height: 1em;
+  border: 1px solid black;
+  border-radius: 50%;
+  padding: 2px;
+  margin-right: 10px;
+}
+
+.amount-text {
+  color: grey;
+}
+
+.amount {
+  color: #004b8d;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+/* Add these styles to your PaymentOptions.css */
+
+.user-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  color: grey;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px 5px;
+  border: none;
+  border-bottom: 1px solid #004b8d; /* UPI button color */
+  color: #004b8d;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  background-color: #004b8d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background-color: #003366;
+}
+
+.message {
+  margin-top: 20px;
+  color: #004b8d;
+  font-size: 1rem;
+}
+
+/* uip section */
+
+.upi-apps {
+  margin-bottom: 30px; /* add space between upi button and OR underline */
+  text-align: left;
+}
+
+.heading {
+  color: black;
+  font-weight: bold;
+  /* margin-bottom: 10px; */
+  /* text-align: left; */
+}
+
+.pay-btn {
+  width: 100%;
+  background: #004b8d;
+  border: none;
+  border-radius: 10px;
+  margin: 0.3rem 0;
+  padding: 0 1rem;
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+}
+
+.app-logo {
+  background: white;
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.upi-name {
+  margin-left: 25px; /* Ensure there's a gap between logo and text */
+  flex: 1 1; /* Take up remaining space */
+  text-align: left; /* Align text to the left */
+}
+
+.arrow-logo {
+  width: 24px;
+  height: 24px;
+  filter: invert(100%);
+  /* margin-right: 3px; */
+}
+
+/* Or section */
+.or-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  background-color: lightgrey;
+}
+
+.or-text {
+  margin: 0 10px;
+  color: lightgrey;
+}
+
+/* Payment link section */
+
+.payment-link-section {
+  margin-bottom: 30px;
+  text-align: left; /* Ensure text aligns left */
+}
+
+.subheading {
+  color: grey;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.phone-number-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 80px; /* Ensure proper spacing */
+  justify-content: space-between; /* Add space between phone number input and send button */
+}
+
+.phone-number-wrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightgrey; /* Single underline for the wrapper */
+  width: 100%; /* Make the wrapper take the full width */
+  margin-right: 5px; /* Adjust this value to create space between underline and send button */
+}
+
+.country-code {
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 700;
+  font-size: 1rem; /* Adjust size as needed */
+  margin-right: -1px; /* Add space between country code and phone number */
+}
+
+.phone-number {
+  border: none;
+  padding: 5px;
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 700; /* Make bold */
+  font-size: 1rem; /* Adjust size as needed */
+}
+
+.send-btn {
+  background-color: #fff; /* Send button with white background */
+  color: #004b8d;
+  border: 1px solid #004b8d; /* Same as pay-btn color */
+  border-radius: 5px;
+  padding: 5px 20px;
+  height: 30px;
+  width: 100px;
+  cursor: pointer;
+  font-weight: 700; /* Bold text */
+  font-size: 1rem; /* Adjust size as needed */
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border-bottom: none; Remove underline */
+  margin-left: 5px; /* Add some space between the send button and the phone number input */
+}
+
+.updates-section {
+  margin-bottom: 20px;
+  text-align: left; /* Ensure text aligns left */
+}
+
+.toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px; /* Adjust width of the switch container */
+  height: 28px; /* Adjust height of the switch container */
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px; /* Adjust border radius to make it smaller */
+  width: 50px; /* Adjust width to make it smaller */
+  height: 24px; /* Adjust height to make it smaller */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Adjust height of the slider knob */
+  width: 20px; /* Adjust width of the slider knob */
+  left: 2px; /* Adjust positioning of the slider knob */
+  bottom: 2px; /* Adjust positioning of the slider knob */
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #004b8d; /* Toggle background color */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #004b8d; /* Toggle focus shadow color */
+}
+
+input:checked + .slider:before {
+  transform: translateX(25px); /* Adjust position */
+}
+
+.slider.round {
+  border-radius: 30px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.powered-by {
+  margin-top: 55px; /* Ensure proper spacing */
+  text-align: center; /* Align center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.powered-by-text {
+  color: grey;
+  font-size: 12px; /* Smaller font size */
+}
+
+.gokwik-logo-large {
+  height: 25px; /* Larger logo size */
+  margin-left: 10px; /* Adjust margin */
+}
+
+.link-text {
+  margin-bottom: 10px; /* Add gap between lines */
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .payment-options {
+    padding: 15px; /* Adjust padding for smaller screens */
+  }
+
+  .upi-apps {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  .phone-number-section {
+    margin-bottom: 60px;
+  }
+
+  .send-btn {
+    width: 80px;
+    padding: 5px 15px;
+    font-size: 0.9rem;
+  }
+
+  .slider {
+    width: 40px;
+    height: 20px;
+  }
+
+  .slider:before {
+    height: 16px;
+    width: 16px;
+    left: -1px;
+    bottom: 2px;
+  }
+
+  .powered-by {
+    margin-top: 45px;
+  }
+
+  .gokwik-logo-large {
+    height: 20px;
+  }
+
+  .amount-text {
+    font-size: 0.9rem;
+  }
+
+  .amount {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 410px) and (min-width: 330px) {
+  .phone-number-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 0; /* Adjust as needed */
+    flex-direction: row; /* Ensure they are in a row */
+    justify-content: space-between; /* Distribute space between elements */
+  }
+
+  .country-code {
+    margin-right: 5px; /* Add space between country code and phone number */
+  }
+
+  .phone-number {
+    flex: 1;
+    width: calc(100% - 40px); /* Adjust width to fit the screen */
+  }
+
+  .send-btn {
+    width: auto;
+    margin-top: 0;
+    margin-left: 10px;
+  }
+}

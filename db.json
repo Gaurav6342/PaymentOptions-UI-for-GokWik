@@ -1,0 +1,31 @@
+{
+  "send": [],
+  "PhonePe": [
+    {
+      "id": "3170",
+      "address": "Plot no 34, Sarve no.153/2, Pavan Nagar,Nav-Vasahat, Soyegaon, Malegaon,Dist.Nashik ,Maharashtra,India423203, Maharashtra",
+      "name": "Gaurav Sanjay Bagul",
+      "phoneNumber": "9860630060",
+      "email": "gaurav.mfworld1997@gmail.com"
+    }
+  ],
+  "GooglePay": [],
+  "Paytm": [
+    {
+      "id": "74de",
+      "address": "fasfasf",
+      "name": "john",
+      "phoneNumber": "2245555545",
+      "email": "f@g.com"
+    }
+  ],
+  "BHIM": [
+    {
+      "id": "f8d7",
+      "address": "x",
+      "name": "Gaurav Bagul",
+      "phoneNumber": "9660630060",
+      "email": "g@gmail.com"
+    }
+  ]
+}

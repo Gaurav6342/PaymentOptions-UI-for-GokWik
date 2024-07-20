@@ -1,0 +1,3033 @@
+im sharing my current files as your previous guides im create two css file paymentoption.css and src/app.js  which file  data is important which file not required also told. and also for you reference :
+
+src/app.js:
+import React, { useState, useEffect } from 'react';
+import PaymentOptions from './components/PaymentOptions';
+import './App.css';
+
+const App = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [user, setUser] = useState({
+    address: '',
+    name: '',
+    phoneNumber: 7838848523,
+    email: '',
+  });
+  const [order, setOrder] = useState({
+    orderType: 'upi',
+    amount: 599,
+  });
+
+  const updateDeviceType = () => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    console.log('User Agent:', userAgent);
+
+    // iOS detection
+    const iosCheck = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    setIsIOS(iosCheck);
+
+    // Android detection
+    const androidCheck = /android/i.test(userAgent);
+    const mobileCheck = androidCheck || iosCheck;
+    setIsMobile(mobileCheck);
+
+    console.log('isMobile:', mobileCheck, 'isIOS:', iosCheck);
+  };
+
+  useEffect(() => {
+    updateDeviceType();
+    window.addEventListener('resize', updateDeviceType);
+
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener('resize', updateDeviceType);
+    };
+  }, []);
+
+  return (
+    <div className="app-container">
+      <PaymentOptions user={user} order={order} isMobile={isMobile} isIOS={isIOS} setUser={setUser} />
+    </div>
+  );
+};
+
+export default App;
+
+<>>><<
+src /components/paymentoption.js:
+import React, { useState } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
+  const [getUpdates, setGetUpdates] = useState(true); // Default state set to true (on)
+
+  const handlePaymentClick = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'GET',
+    });
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    });
+  };
+
+  if (!isMobile) {
+    return <div className="no-payment-options">No payment options available</div>;
+  }
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      <div className="upi-apps">
+        <span className="heading left-align">Pay using UPI Apps</span>
+        <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+          <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+          <span className="upi-name">PhonePe</span>
+          <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+        </button>
+        <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+          <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+          <span className="upi-name">Google Pay</span>
+          <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+        </button>
+        <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+          <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+          <span className="upi-name">Paytm</span>
+          <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+        </button>
+        <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+          <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+          <span className="upi-name">BHIM</span>
+          <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+        </button>
+      </div>
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+<>>>>>>>>>>>><>>>>>>>>
+src/components/paymentoption.css:
+.payment-options {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family:   Noyh; /* Use previous font */
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid lightgrey;
+  
+}
+
+.back-arrow {
+  width: 20px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.mamaearth-logo {
+  height: 20px; /* Adjusted size */
+  margin-top: 4px; /* Added gap */
+  padding-bottom: 10px; /* Add padding to create space between text and underline */
+}
+
+.amount-to-pay {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rupee-symbol {
+  width: 1em; /* Same as text size */
+  height: 1em;
+  border: 1px solid black;
+  border-radius: 50%;
+  padding: 2px;
+  margin-right: 10px;
+}
+
+.amount-text {
+  color: grey;
+}
+
+.amount {
+  color: #034d8f;
+  font-weight: 700;
+}
+
+.upi-apps {
+  margin-top: 40px; /* Add top margin */
+  margin-bottom: 30px;     /*add space between upi buton and OR underline*/
+  text-align: left;
+}
+
+.heading {
+  color: black;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: left;
+  }
+
+.pay-btn {
+  width: 100%;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  margin: 0.3rem 0;
+  padding: 0 1rem;
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.app-logo {
+  background: white;
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.upi-name {
+  margin-left: 25px; /* Ensure there's a gap between logo and text */
+  flex: 1; /* Take up remaining space */
+  text-align: left; /* Align text to the left */
+}
+
+.arrow-logo {
+  width: 24px;
+  height: 24px;
+  filter: invert(100%);
+  margin-right: 3px;
+}
+
+.or-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  background-color: lightgrey;
+}
+
+.or-text {
+  margin: 0 10px;
+  color: lightgrey;
+}
+
+.payment-link-section {
+  margin-bottom: 20px;
+  text-align: left; /* Ensure text aligns left */
+}
+
+.link-header {
+  margin-bottom: 10px; /* Add gap between lines */
+}
+
+.subheading {
+  color: grey;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.phone-number-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 80px; /* Ensure proper spacing */
+  justify-content: space-between; /* Add space between phone number input and send button */
+}
+
+.phone-number-wrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightgrey; /* Single underline for the wrapper */
+  width: 100%; /* Make the wrapper take the full width */
+  margin-right: 5px; /* Adjust this value to create space between underline and send button */
+}
+
+
+.country-code {
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 800;
+  font-size: 1rem; /* Adjust size as needed */
+  margin-right: -1px; /* Add space between country code and phone number */
+}
+
+.phone-number {
+  
+  border: none;
+  padding: 5px;
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 700; /* Make bold */
+  font-size: 1rem; /* Adjust size as needed */
+  
+}
+
+.send-btn {
+  background-color: #fff; /* Send button with white background */
+  color: #004b8d;
+  border: 1px solid #051c30; /* Same as pay-btn color */
+  border-radius: 10px;
+  padding: 5px 20px;
+  height: 30px;
+  width: 100px;
+  cursor: pointer;
+  font-weight: 700; /* Bold text */
+  font-size: 1rem; /* Adjust size as needed */
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: none; /* Remove underline */
+  margin-left: 5px; /* Add some space between the send button and the phone number input */
+}
+.updates-section {
+  margin-bottom: 20px;
+  text-align: left; /* Ensure text aligns left */
+}
+
+.toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px; /* Adjust width of the switch container */
+  height: 28px; /* Adjust height of the switch container */
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px; /* Adjust border radius to make it smaller */
+  width: 50px; /* Adjust width to make it smaller */
+  height: 24px; /* Adjust height to make it smaller */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Adjust height of the slider knob */
+  width: 20px; /* Adjust width of the slider knob */
+  left: 2px; /* Adjust positioning of the slider knob */
+  bottom: 2px; /* Adjust positioning of the slider knob */
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+
+input:checked + .slider {
+  background-color: #004b8d; /* Toggle background color */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #004b8d; /* Toggle focus shadow color */
+}
+
+input:checked + .slider:before {
+  transform: translateX(25px); /* Adjust position */
+}
+
+.slider.round {
+  border-radius: 30px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.powered-by {
+  margin-top: 55px; /* Ensure proper spacing */
+  text-align: center; /* Align center */
+}
+
+.powered-by-text {
+  color: grey;
+  font-size: 12px; /* Smaller font size */
+}
+
+.gokwik-logo-large {
+  height: 25px; /* Larger logo size */
+  margin-left: 5px; /* Adjust margin */
+}
+
+.link-text {
+  margin-bottom: 10px; /* Add gap between lines */
+}
+
+<<>>>>>>>>>>>>>
+src/app.css:
+/* src/App.css */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.payment-options {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+}
+
+.logo {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+.amount-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.amount-container span {
+  font-size: 1.2em;
+  margin: 0 5px;
+}
+
+.amount {
+  color: #004b8d;
+  font-size: 1.2em;
+}
+
+.upi-header {
+  color: black;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.upi-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pay-btn {
+  width: 100%;
+  background: #004b8d;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.upi-logo, .arrow-logo {
+  width: 24px;
+  height: 24px;
+}
+
+.or-separator {
+  color: grey;
+  margin: 20px 0;
+}
+
+.payment-link {
+  margin-bottom: 20px;
+}
+
+.link-header {
+  color: black;
+  font-weight: bold;
+  display: block;
+}
+
+.link-subheader {
+  color: grey;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.phone-input {
+  width: calc(100% - 80px);
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  color: #004b8d;
+}
+
+.send-btn {
+  padding: 10px;
+  border: 1px solid #004b8d;
+  border-radius: 5px;
+  background: white;
+  color: #004b8d;
+  cursor: pointer;
+}
+
+.updates-container {
+  margin-bottom: 20px;
+}
+
+.updates-header {
+  color: black;
+  font-weight: bold;
+  display: block;
+}
+
+.updates-subheader {
+  color: grey;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.toggle-btn {
+  padding: 10px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.powered-by {
+  color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.gokwik-logo {
+  width: 50px;
+  height: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+<<<<<<<<<<<<<>>>>>>>>>>>>>>
+
+
+form with no upi app for desktop devices
+Pymwntoption.js :
+
+
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
+  const [getUpdates, setGetUpdates] = useState(true); // Default state set to true (on)
+
+  const handlePaymentClick = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'GET',
+    });
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${user.name}`, {
+        method: 'GET',
+      });
+    } else {
+      // Show form for required details
+    }
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      // Open form to fill details
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="text"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
+  const [getUpdates, setGetUpdates] = useState(true);
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+
+  const handlePaymentClick = (paymentType) => {
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${paymentType}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        setMessage(`${paymentType} data fetched successfully`);
+      })
+      .catch(error => {
+        console.error(`Error fetching ${paymentType} data:`, error);
+        setMessage(`Error fetching ${paymentType} data`);
+      });
+    } else {
+      setSelectedUpi(paymentType);
+    }
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    fetch(`http://localhost:8080/${selectedUpi}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Form submitted successfully');
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      setMessage('Error fetching data');
+    });
+    setSelectedUpi(null);
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(true);
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'Paytm' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'BHIM' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      {message && <div className="message">{message}</div>}
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+<<<<<>>>>>>>>>>>>>>>>>
+
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+        required
+        pattern="[0-9]{10}"
+        title="Please enter a valid 10-digit phone number"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+  const [getUpdates, setGetUpdates] = useState(true); // Set default to true
+
+  const handlePaymentClick = (paymentType) => {
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${paymentType}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data.length === 0) {
+            saveUserData(paymentType);
+          } else {
+            if (selectedUpi !== paymentType) {
+              setMessage(`Data for ${paymentType} fetched successfully`);
+            }
+          }
+        })
+        .catch(error => {
+          console.error(`Error checking ${paymentType} data:`, error);
+          setMessage(`Error checking ${paymentType} data`);
+        });
+    } else {
+      setSelectedUpi(paymentType);
+    }
+  };
+
+  const saveUserData = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage(`Data saved successfully for ${paymentType}`);
+      setSelectedUpi(null);
+    })
+    .catch(error => {
+      console.error(`Error saving data for ${paymentType}:`, error);
+      setMessage(`Error saving data for ${paymentType}`);
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const isValidPhoneNumber = /^[0-9]{10}$/.test(user.phoneNumber);
+    if (!isValidPhoneNumber) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    saveUserData(selectedUpi);
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(null);
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'Paytm' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'BHIM' && (
+            <UserForm user={user} setUser={setUser} handleFormSubmit={handleFormSubmit} />
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      <div className="message">
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+,.............<<<<<>>>>>>>>>>>>>>>>>>>>
+
+  import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit, resetMessage }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+        required
+        pattern="[0-9]{10}"
+        title="Please enter a valid 10-digit phone number"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+    {resetMessage && <p>{resetMessage}</p>}
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+  const [getUpdates, setGetUpdates] = useState(false); // Example state for updates
+
+  const [phonePeFormData, setPhonePeFormData] = useState({
+    name: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+  });
+  const [googlePayFormData, setGooglePayFormData] = useState({
+    name: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+  });
+  const [paytmFormData, setPaytmFormData] = useState({
+    name: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+  });
+  const [bhimFormData, setBhimFormData] = useState({
+    name: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+  });
+
+  const handlePaymentClick = (paymentType) => {
+    setSelectedUpi(paymentType);
+    setMessage('');
+  };
+
+  const saveUserData = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage(`Data saved successfully for ${paymentType}`);
+      setSelectedUpi(null);
+    })
+    .catch(error => {
+      console.error(`Error saving data for ${paymentType}:`, error);
+      setMessage(`Error saving data for ${paymentType}`);
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const isValidPhoneNumber = /^[0-9]{10}$/.test(user.phoneNumber);
+    if (!isValidPhoneNumber) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    saveUserData(selectedUpi);
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const resetMessage = (paymentType) => {
+    return message === `Data saved successfully for ${paymentType}` || 
+           message === `Data for ${paymentType} fetched successfully`;
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(null);
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+              user={phonePeFormData}
+              setUser={setPhonePeFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('PhonePe')}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+              user={googlePayFormData}
+              setUser={setGooglePayFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('GooglePay')}
+            />
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+              user={phonePeFormData}
+              setUser={setPhonePeFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('PhonePe')}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+              user={googlePayFormData}
+              setUser={setGooglePayFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('GooglePay')}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'Paytm' && (
+            <UserForm
+              user={paytmFormData}
+              setUser={setPaytmFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('Paytm')}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'BHIM' && (
+            <UserForm
+              user={bhimFormData}
+              setUser={setBhimFormData}
+              handleFormSubmit={handleFormSubmit}
+              resetMessage={resetMessage('BHIM')}
+            />
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      <div className="message">
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+
+
+<>>>>>>>>>>>>>>>>>>>>>>>>>>>
+some modification of above code:
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+        required
+        pattern="[0-9]{10}"
+        title="Please enter a valid 10-digit phone number"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+  const [getUpdates, setGetUpdates] = useState(true); // Ensure toggle button is on by default
+
+const handlePaymentClick = (paymentType) => {
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${paymentType}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data.length === 0) {
+            saveUserData(paymentType);
+          } else {
+            if (selectedUpi !== paymentType) {
+              setMessage(`Data for ${paymentType} fetched successfully`);
+            }
+          }
+        })
+        .catch(error => {
+          console.error(`Error checking ${paymentType} data:`, error);
+          setMessage(`Error checking ${paymentType} data`);
+        });
+    } else {
+      setSelectedUpi(paymentType);
+      setMessage('');
+    }
+  };
+  
+  const saveUserData = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage(`Data saved successfully for ${paymentType}`);
+      setSelectedUpi(null);
+    })
+    .catch(error => {
+      console.error(`Error saving data for ${paymentType}:`, error);
+      setMessage(`Error saving data for ${paymentType}`);
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const isValidPhoneNumber = /^[0-9]{10}$/.test(user.phoneNumber);
+    if (!isValidPhoneNumber) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    saveUserData(selectedUpi);
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+const resetMessage = (paymentType) => {
+    setMessage('');
+    setSelectedUpi(paymentType);
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(null);
+    } else {
+      setSelectedUpi(selectedUpi); // Ensure selectedUpi remains when user data is complete
+    }
+  }, [selectedUpi, user]);
+
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+   />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+         
+ />
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+           )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'Paytm' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+          />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'BHIM' && (
+            <UserForm
+            user={user}
+            setUser={setUser}
+            handleFormSubmit={handleFormSubmit}
+             />
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      <div className="message">
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+,,,,,,,,,,,,,,,,,,,,,,,<>>>>>>>>>>>>>>.
+
+hide upi button after sucessfull data saved in the:
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+        required
+        pattern="[0-9]{10}"
+        title="Please enter a valid 10-digit phone number"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+  const [getUpdates, setGetUpdates] = useState(true); // Ensure toggle button is on by default
+  const [formSubmitted, setFormSubmitted] = useState(false); // Track if form has been submitted
+
+  const handlePaymentClick = (paymentType) => {
+    if (formSubmitted) return; // Prevent further UPI button actions if form is submitted
+
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${paymentType}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data.length === 0) {
+            saveUserData(paymentType);
+          } else {
+            if (selectedUpi !== paymentType) {
+              setMessage(`Data for ${paymentType} fetched successfully`);
+            }
+          }
+        })
+        .catch(error => {
+          console.error(`Error checking ${paymentType} data:`, error);
+          setMessage(`Error checking ${paymentType} data`);
+        });
+    } else {
+      setSelectedUpi(paymentType);
+      setMessage('');
+    }
+  };
+
+  const saveUserData = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage(`Data saved successfully for ${paymentType}`);
+      setFormSubmitted(true); // Mark form as submitted
+      setSelectedUpi(null);
+    })
+    .catch(error => {
+      console.error(`Error saving data for ${paymentType}:`, error);
+      setMessage(`Error saving data for ${paymentType}`);
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const isValidPhoneNumber = /^[0-9]{10}$/.test(user.phoneNumber);
+    if (!isValidPhoneNumber) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    saveUserData(selectedUpi);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(null);
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          {!formSubmitted && (
+            <>
+              <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+                <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+                <span className="upi-name">PhonePe</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'PhonePe' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+              <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+                <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+                <span className="upi-name">Google Pay</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'GooglePay' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          {!formSubmitted && (
+            <>
+              <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')}>
+                <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+                <span className="upi-name">PhonePe</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'PhonePe' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+              <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')}>
+                <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+                <span className="upi-name">Google Pay</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'GooglePay' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+              <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')}>
+                <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+                <span className="upi-name">Paytm</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'Paytm' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+              <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')}>
+                <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+                <span className="upi-name">BHIM</span>
+                <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+              </button>
+              {selectedUpi === 'BHIM' && (
+                <UserForm
+                  user={user}
+                  setUser={setUser}
+                  handleFormSubmit={handleFormSubmit}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      <div className="message">
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+
+<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>
+
+
+correct funcatinlities :
+
+
+import React, { useState, useEffect } from 'react';
+import './PaymentOptions.css';
+import BackArrow from '../logos/back_arrow.png';
+import MamaearthLogo from '../logos/mamaearth_logo.png';
+import RupeeSymbol from '../logos/rupee_symbol.png';
+import PhonePeLogo from '../logos/phonepe_logo.svg';
+import ArrowLogo from '../logos/arrow_logo.svg';
+import GooglePayLogo from '../logos/googlepay_logo.png';
+import PaytmLogo from '../logos/paytm_logo.png';
+import BHIMLogo from '../logos/bhim_logo.png';
+import GokwikLogo from '../logos/gokwik_logo.png';
+
+const UserForm = ({ user, setUser, handleFormSubmit }) => (
+  <form className="user-form" onSubmit={handleFormSubmit}>
+    <div className="form-group">
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phoneNumber"
+        value={user.phoneNumber}
+        onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+        className="form-input"
+        required
+        pattern="[0-9]{10}"
+        title="Please enter a valid 10-digit phone number"
+      />
+    </div>
+    <div className="form-group">
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <div className="form-group">
+      <label>Address:</label>
+      <input
+        type="text"
+        name="address"
+        value={user.address}
+        onChange={(e) => setUser({ ...user, address: e.target.value })}
+        className="form-input"
+        required
+      />
+    </div>
+    <button type="submit" className="submit-btn">Submit</button>
+  </form>
+);
+
+const PaymentOptions = ({ user, order, isMobile, isIOS, setUser }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [selectedUpi, setSelectedUpi] = useState(null);
+  const [message, setMessage] = useState('');
+  const [getUpdates, setGetUpdates] = useState(true); // Ensure toggle button is on by default
+  const [formSubmitted, setFormSubmitted] = useState(false); // Track if form has been submitted
+
+  const handlePaymentClick = (paymentType) => {
+    if (formSubmitted) return; // Prevent further UPI button actions if form is submitted
+
+    if (user.name && user.phoneNumber && user.email && user.address) {
+      fetch(`http://localhost:8080/${paymentType}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data.length === 0) {
+            saveUserData(paymentType);
+          } else {
+            if (selectedUpi !== paymentType) {
+              setMessage(`Data for ${paymentType} fetched successfully`);
+            }
+          }
+        })
+        .catch(error => {
+          console.error(`Error checking ${paymentType} data:`, error);
+          setMessage(`Error checking ${paymentType} data`);
+        });
+    } else {
+      setSelectedUpi(paymentType);
+      setMessage('');
+    }
+  };
+
+  const saveUserData = (paymentType) => {
+    fetch(`http://localhost:8080/${paymentType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage(`Data saved successfully for ${paymentType}`);
+      setFormSubmitted(true); // Mark form as submitted
+      setSelectedUpi(null);
+    })
+    .catch(error => {
+      console.error(`Error saving data for ${paymentType}:`, error);
+      setMessage(`Error saving data for ${paymentType}`);
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const isValidPhoneNumber = /^[0-9]{10}$/.test(user.phoneNumber);
+    if (!isValidPhoneNumber) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    saveUserData(selectedUpi);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  };
+
+  const handleSendClick = () => {
+    fetch('http://localhost:8080/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.amount,
+        phoneNumber: phoneNumber,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      setMessage('Data sent successfully');
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      setMessage('Error sending data');
+    });
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  useEffect(() => {
+    if (!user.phoneNumber) {
+      setSelectedUpi(null);
+    }
+  }, [user]);
+
+  return (
+    <div className="payment-options">
+      <div className="logo-section">
+        <img src={BackArrow} alt="Back" className="back-arrow" />
+        <img src={MamaearthLogo} alt="Mamaearth" className="mamaearth-logo" />
+      </div>
+      <div className="amount-to-pay">
+        <img src={RupeeSymbol} alt="Rupee" className="rupee-symbol" />
+        <span className="amount-text">Amount to Pay:</span>
+        <span className="amount">₹{order.amount}</span>
+      </div>
+      {isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')} disabled={formSubmitted}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')} disabled={formSubmitted}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+        </div>
+      )}
+      {isMobile && !isIOS && (
+        <div className="upi-apps">
+          <span className="heading left-align">Pay using UPI Apps</span>
+          <button className="pay-btn" onClick={() => handlePaymentClick('PhonePe')} disabled={formSubmitted}>
+            <img src={PhonePeLogo} alt="PhonePe" className="app-logo" />
+            <span className="upi-name">PhonePe</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'PhonePe' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('GooglePay')} disabled={formSubmitted}>
+            <img src={GooglePayLogo} alt="Google Pay" className="app-logo" />
+            <span className="upi-name">Google Pay</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'GooglePay' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('Paytm')} disabled={formSubmitted}>
+            <img src={PaytmLogo} alt="Paytm" className="app-logo" />
+            <span className="upi-name">Paytm</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'Paytm' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+          <button className="pay-btn" onClick={() => handlePaymentClick('BHIM')} disabled={formSubmitted}>
+            <img src={BHIMLogo} alt="BHIM" className="app-logo" />
+            <span className="upi-name">BHIM</span>
+            <img src={ArrowLogo} alt="Arrow" className="arrow-logo" />
+          </button>
+          {selectedUpi === 'BHIM' && (
+            <UserForm
+              user={user}
+              setUser={setUser}
+              handleFormSubmit={handleFormSubmit}
+            />
+          )}
+        </div>
+      )}
+      {!isMobile && (
+        <div className="no-payment-options">No payment options available</div>
+      )}
+      <div className="or-separator">
+        <span className="line"></span>
+        <span className="or-text">OR</span>
+        <span className="line"></span>
+      </div>
+      <div className="payment-link-section left-align">
+        <span className="heading">Get Payment Link</span>
+        <span className="subheading">You will get a payment link on</span>
+        <div className="phone-number-section">
+          <div className="phone-number-wrapper">
+            <span className="country-code">+91 - </span>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className="phone-number"
+            />
+          </div>
+          <button className="send-btn" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+      <div className="updates-section left-align">
+        <span className="heading">Get WhatsApp and SMS Updates</span>
+        <div className="toggle-section">
+          <span className="subheading">Click on this to turn off updates</span>
+          <label className="switch">
+            <input type="checkbox" checked={getUpdates} onChange={() => setGetUpdates(!getUpdates)} />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div className="powered-by">
+        <span className="powered-by-text">Powered By</span>
+        <img src={GokwikLogo} alt="Gokwik" className="gokwik-logo-large" />
+      </div>
+      <div className="message">
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentOptions;
+
+
+
+
+
+
+
+<>>>>>>>>>>>>>>>
+csss:
+
+/* PaymentOptions.css */
+
+
+.payment-options {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* text-align: center; */
+  overflow-y: auto; /* Enable vertical scrolling when content exceeds height */
+  overflow-x: auto;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid lightgrey;
+  
+}
+
+.back-arrow {
+  width: 20px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.mamaearth-logo {
+  height: 20px; /* Adjusted size */
+  margin-top: 4px; /* Added gap */
+  padding-bottom: 10px; /* Add padding to create space between text and underline */
+}
+
+.amount-to-pay {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;    
+}
+
+.rupee-symbol {
+  width: 1em; /* Same as text size */
+  height: 1em;
+  border: 1px solid black;
+  border-radius: 50%;
+  padding: 2px;
+  margin-right: 10px;
+}
+
+.amount-text {
+  color: grey;
+}
+
+.amount {
+  color: #004b8d;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+/* Add these styles to your PaymentOptions.css */
+
+.user-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  color: grey;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px 5px;
+  border: none;
+  border-bottom: 1px solid #004b8d; /* UPI button color */
+  color: #004b8d;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  background-color: #004b8d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background-color: #003366;
+}
+
+.message {
+  margin-top: 20px;
+  color: #004b8d;
+  font-size: 1rem;
+}
+
+
+/* uip section */
+
+.upi-apps {
+
+  margin-bottom: 30px;     /*add space between upi buton and OR underline*/
+  text-align: left;
+}
+
+.heading {
+  color: black;
+  font-weight: bold;
+  /* margin-bottom: 10px; */
+  /* text-align: left; */
+  }
+
+.pay-btn {
+  width: 100%;
+  background: #004b8d;
+  border: none;
+  border-radius: 10px;
+  margin: 0.3rem 0;
+  padding: 0 1rem;
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+}
+
+.app-logo {
+  background: white;
+  border-radius: 50%;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.upi-name {
+  margin-left: 25px; /* Ensure there's a gap between logo and text */
+  flex: 1 1; /* Take up remaining space */
+  text-align: left; /* Align text to the left */
+}
+
+.arrow-logo {
+  width: 24px;
+  height: 24px;
+  filter: invert(100%);
+  /* margin-right: 3px; */
+}
+
+
+/*   Or section  */
+.or-separator {
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  background-color: lightgrey;   
+}
+
+.or-text {
+  margin: 0 10px;
+  color: lightgrey;
+}
+
+
+  /*  Payment  link section */
+
+.payment-link-section {
+  margin-bottom: 30px;
+  text-align: left; /* Ensure text aligns left */
+}
+/* 
+.link-header {
+  margin-bottom: 10px; /* Add gap between lines */
+  /* color: black;
+  font-weight: bold;
+  display: block; */
+/* } */
+
+.subheading {
+  color: grey;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.phone-number-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 80px; /* Ensure proper spacing */
+  justify-content: space-between; /* Add space between phone number input and send button */
+}
+
+.phone-number-wrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightgrey; /* Single underline for the wrapper */
+  width: 100%; /* Make the wrapper take the full width */
+  margin-right: 5px; /* Adjust this value to create space between underline and send button */
+}
+
+
+.country-code {
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 700;
+  font-size: 1rem; /* Adjust size as needed */
+  margin-right: -1px; /* Add space between country code and phone number */
+}
+
+.phone-number {
+  
+  border: none;
+  padding: 5px;
+  color: #004b8d; /* Same as pay-btn color */
+  font-weight: 700; /* Make bold */
+  font-size: 1rem; /* Adjust size as needed */
+  
+}
+
+.send-btn {
+  background-color: #fff; /* Send button with white background */
+  color: #004b8d;
+  border: 1px solid #004b8d; /* Same as pay-btn color */
+  border-radius: 5px;
+  padding: 5px 20px;
+
+  height: 30px;
+  width: 100px;
+  cursor: pointer;
+  font-weight: 700; /* Bold text */
+  font-size: 1rem; /* Adjust size as needed */
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border-bottom: none; Remove underline */
+  margin-left: 5px; /* Add some space between the send button and the phone number input */
+}
+.updates-section {
+  margin-bottom: 20px;
+  text-align: left; /* Ensure text aligns left */
+
+}
+
+.toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+  
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px; /* Adjust width of the switch container */
+  height: 28px; /* Adjust height of the switch container */
+
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px; /* Adjust border radius to make it smaller */
+  width: 50px; /* Adjust width to make it smaller */
+  height: 24px; /* Adjust height to make it smaller */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Adjust height of the slider knob */
+  width: 20px; /* Adjust width of the slider knob */
+  left: 2px; /* Adjust positioning of the slider knob */
+  bottom: 2px; /* Adjust positioning of the slider knob */
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+
+input:checked + .slider {
+  background-color: #004b8d; /* Toggle background color */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #004b8d; /* Toggle focus shadow color */
+}
+
+input:checked + .slider:before {
+  transform: translateX(25px); /* Adjust position */
+}
+
+.slider.round {
+  border-radius: 30px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.powered-by {
+  margin-top: 55px; /* Ensure proper spacing */
+  text-align: center; /* Align center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.powered-by-text {
+  color: grey;
+  font-size: 12px; /* Smaller font size */
+}
+
+.gokwik-logo-large {
+  height: 25px; /* Larger logo size */
+  margin-left: 10px; /* Adjust margin */
+}
+
+.link-text {
+  margin-bottom: 10px; /* Add gap between lines */
+}
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .payment-options {
+    padding: 15px; /* Adjust padding for smaller screens */
+  }
+
+  .upi-apps {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  .phone-number-section {
+    margin-bottom: 60px;
+  }
+
+  .send-btn {
+    width: 80px;
+    padding: 5px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .slider {
+    width: 40px;
+    height: 20px;
+  }
+
+  .slider:before {
+    height: 16px;
+    width: 16px;
+    left: -1px;
+    bottom: 2px;
+  }
+
+  .powered-by {
+    margin-top: 45px;
+  }
+
+  .gokwik-logo-large {
+    height: 20px;
+  }
+
+  .amount-text {
+    font-size: 0.9rem;
+  }
+
+  .amount {
+    font-size: 1.2rem;
+  }
+}
+
+
+
+
+
+
+
+
+
+<>>>>>>>>>>>>>>
+
+3. also  as mentioned ios device only show two upi button and its work but it works only some ios device like iphones but some in ipod air, ipod mini ,ipad pro  
+
+4. and in some mobile screen whose width is from below 410 to 350 conrty code and number not in one line and  also below 360 send button  also some left part hide
+
+
+
+flex: 1
+filter: invert(100%);
