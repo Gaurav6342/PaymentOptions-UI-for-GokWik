@@ -4,6 +4,7 @@
       1.npm start 
       2. json-server --watch db.json --port 8080 
 
+  ![Gokwik--Front-End-assignment-](CaptureJPG.jpg)
 
   output of assignment part 1 - 
                         
