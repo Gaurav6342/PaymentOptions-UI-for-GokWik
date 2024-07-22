@@ -9,7 +9,7 @@
 
 1. **Clone the Repository**
     ```bash
-    git clone https://github.com/your-username/PaymentOptions.git
+    git clone https://github.com/Gaurav6342/PaymentOptions-UI-for-GokWik.git
     cd PaymentOptions
     ```
 
