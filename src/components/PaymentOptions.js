@@ -1,3 +1,5 @@
+const API_URL = 'https://paymentoption-ui-for-gokwik-json-server.onrender.com'; // New API URL
+
 import React, { useState, useEffect } from 'react';
 import './PaymentOptions.css'; // Make sure this path is correct and the CSS file contains merged styles
 import BackArrow from '../logos/back_arrow.png';
@@ -9,7 +11,6 @@ import GooglePayLogo from '../logos/googlepay_logo.png';
 import PaytmLogo from '../logos/paytm_logo.png';
 import BHIMLogo from '../logos/bhim_logo.png';
 import GokwikLogo from '../logos/gokwik_logo.png';
-const API_URL = 'https://paymentoption-ui-for-gokwik-json-server.onrender.com'; // New API URL
 
 
 const UserForm = ({ user, setUser, handleFormSubmit }) => (
